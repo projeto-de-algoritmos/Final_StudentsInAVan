@@ -1,6 +1,6 @@
 # Final_StudentsInAVan
 
-**Conteúdo da Disciplina**: Programação Dinâmica<br>
+**Conteúdo da Disciplina**: Programação Dinâmica e Grafos 2<br>
 
 ## Alunos
 |Matrícula | Aluno |
