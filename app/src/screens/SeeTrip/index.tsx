@@ -83,9 +83,7 @@ export default function FindWayScreen({navigation}) {
         knapsack(n-1, capacity, qtdStudents);
         escolasArr.push(["home",0])
         takeCatched(n, capacity);
-        //console.log(escolasArr);
         addpaths();
-        console.log(graph);
         Alert.alert("Quantidade de crianças buscadas: ", memo[capacity][n].toString());
     }
 
