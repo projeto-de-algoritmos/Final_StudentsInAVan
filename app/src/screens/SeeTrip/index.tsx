@@ -13,41 +13,55 @@ export default function FindWayScreen({navigation}) {
   var result;
   var memo = Array(16);
   var catched = Array(16);
+  var escolasArr = [];
   let valNotCatch = 0;
+  let valCatch = 0;
+  sum = 0;
 
     function knapsack(n,capacity,qtdStudents){
-        //console.log("bag: ", capacity, "posArray: ", n);
-        //console.log("posicao no array: ",n);
-        //console.log("valor no array: ",qtdStudents[n]);
-        //console.log("não pegando: ",valNotCatch);
         if(n == -1 || capacity == 0){
             return 0;
         }
-        if(qtdStudents[n] > capacity){
+        if(capacity - qtdStudents[n] < 0){
             memo[capacity][n+1] = knapsack(n-1,capacity,qtdStudents);
             return memo[capacity][n+1];
         }
 
-        let aux = capacity-qtdStudents[n]
-        let valCatch = qtdStudents[n]+knapsack(n-1, aux, qtdStudents);
-        valNotCatch += knapsack(n-1,capacity,qtdStudents);
-        //console.log("pegando: ", valCatch)
+        let aux = capacity-qtdStudents[n];
+        let valCatch = qtdStudents[n] + knapsack(n-1, aux, qtdStudents);
+        let valNotCatch = knapsack(n-1,capacity,qtdStudents);
 
         if(valCatch > valNotCatch){
             memo[capacity][n+1] = valCatch;
             catched[capacity][n+1] = 1; 
+            sum+=valCatch;
         }
         else{
             memo[capacity][n+1] = valNotCatch;
             catched[capacity][n+1] = 0;
+            sum+=valNotCatch;
         }
-        //console.log("rodei ate o final");
+
         return memo[capacity][n+1];
     }
 
+    function takeCatched(n, capacity){
+        console.log("n: ",n,"capacidade: ",capacity);
+        if(capacity == 0 || n == 0){
+            return;
+        }
+        if(catched[capacity][n] == 1){
+            escolasArr.push(qtdStudents[n-1]);
+            takeCatched(n, capacity-qtdStudents[n-1]);
+        }
+        else{
+            takeCatched(n-1, capacity);
+        }
+    }
+
     function alertResult(){
-        console.log("quantidade de alunos: ", qtdStudents);
-        
+        valNotCatch = 0;
+        valCatch = 0;
         for(let i=0;i<memo.length;i++){
             memo[i] = new Array(n+1).fill(-1);
             catched[i] = new Array(n+1).fill(0);
@@ -57,7 +71,9 @@ export default function FindWayScreen({navigation}) {
             memo[i][0] = 0;
         }
         knapsack(n-1, capacity, qtdStudents);
-        Alert.alert(memo[capacity][n-1].toString());
+        console.log("separa aki pra mim");
+        takeCatched(n, capacity);
+        Alert.alert(memo[capacity][n].toString());
     }
 
     return (
