@@ -17,6 +17,7 @@ export default function FindWayScreen({navigation}) {
   let valNotCatch = 0;
   let valCatch = 0;
   sum = 0;
+  let graph = [];
 
     function knapsack(n,capacity,qtdStudents){
         if(n == -1 || capacity == 0){
@@ -46,16 +47,25 @@ export default function FindWayScreen({navigation}) {
     }
 
     function takeCatched(n, capacity){
-        console.log("n: ",n,"capacidade: ",capacity);
         if(capacity == 0 || n == 0){
             return;
         }
         if(catched[capacity][n] == 1){
-            escolasArr.push(qtdStudents[n-1]);
+            escolasArr.push(schools[n-1]);
             takeCatched(n, capacity-qtdStudents[n-1]);
         }
         else{
             takeCatched(n-1, capacity);
+        }
+    }
+    function addpaths(){
+        var snames = escolasArr.map((cschool) => cschool[0]);
+        for(let i =0;i<escolasArr.length;i++){
+            for(let j=0; j<escolasArr.length;j++){
+                if(snames[i] != snames[j]){
+                    graph.push([snames[j],Math.floor(Math.random()*10+1)]);   
+                }
+            }
         }
     }
 
@@ -71,9 +81,39 @@ export default function FindWayScreen({navigation}) {
             memo[i][0] = 0;
         }
         knapsack(n-1, capacity, qtdStudents);
-        console.log("separa aki pra mim");
+        escolasArr.push(["home",0])
         takeCatched(n, capacity);
-        Alert.alert(memo[capacity][n].toString());
+        //console.log(escolasArr);
+        addpaths();
+        console.log(graph);
+        Alert.alert("Quantidade de crianças buscadas: ", memo[capacity][n].toString());
+    }
+
+    function Dikjstra(startNode){
+            let distances = {};
+            let prev = {};
+            let pq = new Queue(graph.length * graph.length);
+            distances[startNode] = 0;
+            pq.enqueue(startNode, 0);
+            graph.forEach(node => {
+               if (node !== startNode) distances[node] = Infinity;
+               prev[node] = null;
+            });
+         
+            while (!pq.isEmpty()) {
+               let minNode = pq.dequeue();
+               let currNode = minNode.data;
+               let weight = minNode.priority;
+               this.edges[currNode].forEach(neighbor => {
+                  let alt = distances[currNode] + neighbor.weight;
+                  if (alt < distances[neighbor.node]) {
+                     distances[neighbor.node] = alt;
+                     prev[neighbor.node] = currNode;
+                     pq.enqueue(neighbor.node, distances[neighbor.node]);
+                  }
+               });
+            }
+            Alert.alert("Distancias: ", distances.toString());
     }
 
     return (
@@ -82,6 +122,11 @@ export default function FindWayScreen({navigation}) {
             <Button
             onPress={() => alertResult()}
             title="Mostrar Máximo de alunos"
+            color="#841584"
+            />
+            <Button
+            onPress={() => Dikjstra(graph[0])}
+            title="Mostrar caminho"
             color="#841584"
             />
             <StatusBar style="auto" />
